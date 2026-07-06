@@ -17,7 +17,7 @@ A multi-agent financial analysis system built with LangGraph and LangChain.
 - LangGraph
 - LangChain
 - Google Gemini
-- yfinance (Coming Soon)
+- yfinance 
 
 ## Project Status
 
