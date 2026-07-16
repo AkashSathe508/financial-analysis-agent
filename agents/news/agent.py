@@ -1,8 +1,12 @@
+import logging
+
 from langchain_core.messages import HumanMessage
 from langgraph.prebuilt import create_react_agent
 from state.financial_state import FinancialState
 from llms.gemini import reasoning_llm
 from tools.search_tools import news_tool
+
+logger = logging.getLogger(__name__)
 
 #News ReAct Agent
 news_react_agent = create_react_agent(
@@ -17,11 +21,12 @@ def news_agent(state: FinancialState):
 
     query = state["query"]
 
-    result = news_react_agent.invoke(
-        {
-            "messages": [
-                HumanMessage(
-                    content=f"""
+    try:
+        result = news_react_agent.invoke(
+            {
+                "messages": [
+                    HumanMessage(
+                        content=f"""
                         You are a financial news analyst.
 
                         Find the latest news related to:
@@ -39,10 +44,19 @@ def news_agent(state: FinancialState):
 
                         Keep the answer concise.
                         """
-                )
-            ]
+                    )
+                ]
+            }
+        )
+    except Exception as exc:
+        logger.warning("News agent failed; returning fallback analysis: %s", exc)
+        return {
+            "agent_outputs": {
+                "news": {
+                    "analysis": "News analysis unavailable because the news model or search quota was exhausted."
+                }
+            }
         }
-    )
 
     last_message = result["messages"][-1]
 

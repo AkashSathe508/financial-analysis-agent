@@ -1,5 +1,34 @@
+import logging
+
 from state.financial_state import FinancialState
 from llms.gemini import reasoning_llm
+
+logger = logging.getLogger(__name__)
+
+
+def _section(title: str, content: str) -> str:
+    content = (content or "").strip()
+    return f"# {title}\n\n{content or 'Not available.'}"
+
+
+def _fallback_report(market: str, news: str, rag: str, risk: str, investment: str) -> str:
+    return "\n\n".join(
+        [
+            _section(
+                "Executive Summary",
+                "The final narrative model quota was exhausted, so this report preserves the completed agent findings in a structured format.",
+            ),
+            _section("Market Performance", market),
+            _section("Financial Analysis", rag),
+            _section("Recent News", news),
+            _section("Risk Assessment", risk),
+            _section("Investment Recommendation", investment),
+            _section(
+                "Final Conclusion",
+                "Review the source sections above before making an investment decision.",
+            ),
+        ]
+    )
 
 
 def report_generator(state: FinancialState):
@@ -76,23 +105,26 @@ Use professional language.
 Keep the report around 600-800 words.
 """
 
-    answer = reasoning_llm.invoke(prompt)
+    try:
+        answer = reasoning_llm.invoke(prompt)
+        final_report = answer.content
+    except Exception as exc:
+        logger.warning("Report generator failed; returning fallback report: %s", exc)
+        final_report = _fallback_report(market, news, rag, risk, investment)
 
     return {
         "agent_outputs": {
             "report": {
-                "analysis": answer.content
+                "analysis": final_report
             }
         },
-        "final_report": answer.content
+        "final_report": final_report
     }
 
 
 def synchronization_barrier(state: FinancialState):
 
-    print("=" * 60)
-    print("All parallel agents completed.")
-    print("=" * 60)
+    logger.debug("All parallel agents completed (market, news, rag).")
 
     # market_agent, news_agent, and the rag_agent subgraph each already
     # merge their own result into agent_outputs directly (via the

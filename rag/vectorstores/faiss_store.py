@@ -1,19 +1,10 @@
-from langchain_community.vectorstores import FAISS
-from rag.loaders.pdf_loader import load_financial_report
-from rag.splitter.text_splitter import split_documents
-from rag.embeddings.huggingface import embedding_model
-
-docs = load_financial_report(
-    "data/reports/Apple_2025_Annual_Report.pdf"
+from rag.vectorstores.session_registry import (
+    SessionChunksProxy,
+    SessionRetrieverProxy,
+    SessionVectorStoreProxy,
 )
 
-chunks = split_documents(docs)
 
-vector_store = FAISS.from_documents(
-    documents=chunks,
-    embedding=embedding_model
-)
-
-base_retriever = vector_store.as_retriever(
-    search_kwargs={"k": 4}
-)
+vector_store = SessionVectorStoreProxy()
+chunks = SessionChunksProxy()
+base_retriever = SessionRetrieverProxy("base_retriever")

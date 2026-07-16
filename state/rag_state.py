@@ -1,9 +1,12 @@
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated, NotRequired
 import operator
 from langchain_core.documents import Document
 
 
 class RAGState(TypedDict):
+    # Propagated from FinancialState so retrievers can select the uploaded PDF.
+    session_id: NotRequired[str]
+
     query: str
     rewritten_query: str
 

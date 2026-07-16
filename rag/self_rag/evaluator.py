@@ -1,8 +1,12 @@
 from rag.self_rag.models import SelfRAGDecision
-from llms.groq import fast_llm
+from llms.groq import fast_llm, invoke_with_rate_limit_retry
 from state.rag_state import RAGState
 
 self_rag_llm = fast_llm.with_structured_output(SelfRAGDecision)
+
+MAX_EVAL_DOCS = 2
+MAX_EVAL_DOC_CHARS = 250
+MAX_EVAL_ANSWER_CHARS = 900
 
 
 def evaluate_answer(question, context, answer):
@@ -36,7 +40,7 @@ return INSUFFICIENT.
 Provide a short reason.
 """
 
-    return self_rag_llm.invoke(prompt)
+    return invoke_with_rate_limit_retry(self_rag_llm, prompt)
 
 
 def self_rag_router(state: RAGState):

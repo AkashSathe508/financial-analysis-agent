@@ -1,4 +1,4 @@
-from langchain_community.retrievers import BM25Retriever
-from rag.vectorstores.faiss_store import chunks
+from rag.vectorstores.session_registry import SessionRetrieverProxy
 
-bm25_retriever = BM25Retriever.from_documents(chunks)
+
+bm25_retriever = SessionRetrieverProxy("bm25_retriever")

@@ -77,16 +77,59 @@ financial_analysis/
 
 ## Running
 
+Install dependencies:
+
 ```bash
-python app.py
+pip install -r requirements.txt
 ```
 
-## Data
+Start the FastAPI backend:
 
-Place financial report PDFs in:
-
-```
-data/reports/
+```bash
+uvicorn backend.app:app --reload --port 8000
 ```
 
-The system currently loads `Apple_2025_Annual_Report.pdf`.
+Start the existing frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Backend API
+
+Upload a PDF annual report:
+
+```bash
+curl -X POST http://localhost:8000/upload ^
+  -F "file=@path/to/annual-report.pdf"
+```
+
+The response includes a `session_id` and `document_id`. Pass the session with the `X-Session-ID` header, the `session_id` request field, or the session cookie set by `/upload`.
+
+Run analysis:
+
+```bash
+curl -X POST http://localhost:8000/analyze ^
+  -H "Content-Type: application/json" ^
+  -H "X-Session-ID: <session_id>" ^
+  -d "{\"query\":\"Analyze Apple.\",\"company\":\"Apple\"}"
+```
+
+Fetch the generated report:
+
+```
+curl http://localhost:8000/report/<session_id>
+```
+
+The existing frontend can continue using `POST /api/analyze`, which returns Server-Sent Events for the live pipeline UI.
+
+## Uploaded Data
+
+Users no longer need to place PDFs in `data/reports/`. Uploaded documents are stored per session:
+
+```
+backend/storage/uploads/{session_id}/
+backend/storage/vectors/{session_id}/
+```

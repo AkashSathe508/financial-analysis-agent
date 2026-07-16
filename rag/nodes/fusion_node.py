@@ -1,6 +1,8 @@
 from state.rag_state import RAGState
 from rag.fusion.reciprocal_rank_fusion import reciprocal_rank_fusion
 
+MAX_FUSED_DOCS = 4
+
 
 def fusion_node(state: RAGState):
 
@@ -12,5 +14,5 @@ def fusion_node(state: RAGState):
     )
 
     return {
-        "fused_docs": fused
+        "fused_docs": fused[:MAX_FUSED_DOCS]
     }

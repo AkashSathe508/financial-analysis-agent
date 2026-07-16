@@ -1,8 +1,10 @@
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated, NotRequired
 import operator
 
 
 class FinancialState(TypedDict):
+    # Backend session used to select the uploaded financial report index.
+    session_id: NotRequired[str]
 
     # User Input
     query: str

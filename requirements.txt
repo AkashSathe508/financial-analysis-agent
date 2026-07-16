@@ -1,4 +1,7 @@
 langgraph
+fastapi
+uvicorn
+python-multipart
 langchain
 langchain-groq
 langchain-google-genai

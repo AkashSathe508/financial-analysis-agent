@@ -5,7 +5,8 @@ from rag.retrievers.semantic import retriever
 def semantic_retrieval_node(state: RAGState):
 
     docs = retriever.invoke(
-        state["rewritten_query"]
+        state["rewritten_query"],
+        session_id=state.get("session_id")
     )
 
     return {

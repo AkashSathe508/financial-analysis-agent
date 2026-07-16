@@ -1,5 +1,33 @@
+import logging
+
 from state.financial_state import FinancialState
 from llms.gemini import reasoning_llm
+
+logger = logging.getLogger(__name__)
+
+
+def _clip(text: str, limit: int = 700) -> str:
+    text = (text or "").strip()
+    return text[:limit] + ("..." if len(text) > limit else "")
+
+
+def _fallback_investment(market: str, rag: str, news: str, risk: str) -> str:
+    return f"""
+1. Recommendation
+Hold / Review Required
+
+2. Confidence
+Low
+
+3. Suitable For
+Long-term investors who can review the source analysis manually.
+
+4. Key Reasons
+{_clip(market) or "Market analysis was unavailable."}
+
+5. Potential Concerns
+{_clip(risk or rag or news) or "Risk, filing, and news details were limited."}
+""".strip()
 
 
 def investment_agent(state: FinancialState):
@@ -54,12 +82,17 @@ def investment_agent(state: FinancialState):
     Keep the response under 250 words.
     """
 
-    answer = reasoning_llm.invoke(prompt)
+    try:
+        answer = reasoning_llm.invoke(prompt)
+        analysis = answer.content
+    except Exception as exc:
+        logger.warning("Investment agent failed; returning fallback recommendation: %s", exc)
+        analysis = _fallback_investment(market, rag, news, risk)
 
     return {
         "agent_outputs": {
             "investment": {
-                "analysis": answer.content
+                "analysis": analysis
             }
         }
     }

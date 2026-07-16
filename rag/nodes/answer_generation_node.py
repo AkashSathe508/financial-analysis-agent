@@ -1,5 +1,5 @@
 from state.rag_state import RAGState
-from llms.groq import fast_llm
+from llms.groq import fast_llm, invoke_with_rate_limit_retry
 
 
 def answer_generation_node(state: RAGState):
@@ -16,7 +16,7 @@ Question:
 {state["rewritten_query"]}
 """
 
-    answer = fast_llm.invoke(prompt)
+    answer = invoke_with_rate_limit_retry(fast_llm, prompt)
 
     return {
         "answer": answer.content

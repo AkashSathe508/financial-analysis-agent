@@ -7,3 +7,12 @@ __pycache__/
 # Virtual Environment
 venv/
 .env
+
+# Runtime backend storage
+backend/storage/*.log
+backend/storage/uploads/*
+!backend/storage/uploads/.gitkeep
+backend/storage/vectors/*
+!backend/storage/vectors/.gitkeep
+backend/storage/reports/*
+!backend/storage/reports/.gitkeep

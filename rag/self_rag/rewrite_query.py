@@ -1,5 +1,5 @@
 from rag.self_rag.models import QueryRewrite
-from llms.groq import fast_llm
+from llms.groq import fast_llm, invoke_with_rate_limit_retry
 
 rewrite_llm = fast_llm.with_structured_output(QueryRewrite)
 
@@ -24,4 +24,4 @@ Use financial terminology.
 Return only the rewritten query.
 """
 
-    return rewrite_llm.invoke(prompt)
+    return invoke_with_rate_limit_retry(rewrite_llm, prompt)
